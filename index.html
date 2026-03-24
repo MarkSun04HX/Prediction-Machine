@@ -1,1 +1,61 @@
-<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Prediction Webpage</title>\n    <style>\n        body { font-family: Arial, sans-serif; }\n        form { margin: 20px; }\n        label { display: block; margin: 5px 0; }\n        input { margin: 10px 0; }\n        button { margin-top: 10px; }\n    </style>\n</head>\n<body>\n    <h1>Prediction Input Form</h1>\n    <form id="predictionForm">\n        <label for="model">Select Model:</label>\n        <select id="model">\n            <option value="model1">Model 1</option>\n            <option value="model2">Model 2</option>\n            <option value="model3">Model 3</option>\n        </select>\n        <label for="inputData">Enter Data:</label>\n        <input type="text" id="inputData" required />\n        <button type="submit">Make Prediction</button>\n    </form>\n    <div id="result"></div>\n    <script>\n        document.getElementById('predictionForm').addEventListener('submit', function(e) {\n            e.preventDefault();\n            const model = document.getElementById('model').value;\n            const inputData = document.getElementById('inputData').value;\n            document.getElementById('result').innerText = `You selected ${model} with input data: ${inputData}`;\n        });\n    </script>\n</body>\n</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Webpage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: #333;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #4a90e2;
+        }
+        .model {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Prediction Models</h1>
+    </header>
+    <div class="container">
+        <div class="model">
+            <h2>Random Forest Model</h2>
+            <p>Root Mean Squared Error (RMSE): [Insert RMSE data]</p>
+            <p>Confidence Intervals: [Insert Confidence Interval data]</p>
+        </div>
+        <div class="model">
+            <h2>XGBoost Model</h2>
+            <p>Root Mean Squared Error (RMSE): [Insert RMSE data]</p>
+            <p>Confidence Intervals: [Insert Confidence Interval data]</p>
+        </div>
+    </div>
+    <footer class="footer">
+        <p>&copy; 2026 Prediction Machine</p>
+    </footer>
+</body>
+</html>
