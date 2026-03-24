@@ -18,7 +18,7 @@
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
         }
 
         .container {
@@ -28,31 +28,34 @@
             max-width: 900px;
             width: 100%;
             padding: 40px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
             position: relative;
         }
 
         .back-button {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 15px;
+            left: 15px;
             background: #f0f0f0;
-            border: none;
+            border: 2px solid #e0e0e0;
             padding: 10px 15px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             color: #333;
             transition: all 0.3s ease;
+            font-size: 0.9em;
+            z-index: 1000;
         }
 
         .back-button:hover {
             background: #e0e0e0;
+            border-color: #667eea;
             transform: translateX(-3px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
         }
 
         .header h1 {
@@ -414,8 +417,9 @@
 </head>
 <body>
     <div class="container">
+        <button class="back-button hidden" id="backButton" onclick="goBack()">← Back</button>
+
         <div class="header">
-            <button class="back-button hidden" id="backButton" onclick="goBack()">← Back</button>
             <h1>⚡ XGBoost Tool</h1>
             <p>Cross-Validation or Prediction</p>
         </div>
