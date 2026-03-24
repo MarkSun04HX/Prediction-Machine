@@ -3,7 +3,7 @@
 ## Overview
 Easy-ML is a user-friendly machine learning library that provides easy-to-use implementations of popular algorithms. This documentation covers setup, file structure, CSV format requirements, per-model feature requirements, and evaluation metrics.
 
-There is **no hub page**. Open the **model file you want** directly in your browser (double-click the file, or “Open with” your browser). Each model is a standalone HTML page in the project root, for example **`XGBoost.html`**, **`RandomForest.html`**, **`LinearRegression.html`**, and so on.
+There is **no hub page**. Open the **model file you want** in the models folder directly in your browser (double-click the file, or “Open with” your browser). Each model is a standalone HTML page in the project root, for example **`XGBoost.html`**, **`RandomForest.html`**, **`LinearRegression.html`**, and so on.
 
 All model `.html` files can live in the same folder together; you only need the file for the model you are using. Copy that single file anywhere you like and it will still run on its own.
 
