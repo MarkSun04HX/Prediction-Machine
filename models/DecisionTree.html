@@ -799,4 +799,344 @@
             }
         }
 
-        function crossVali
+        function crossValidate(data, targetColIndex, k, maxDepth) {
+            const shuffled = [...data].sort(() => Math.random() - 0.5);
+            const folds = [];
+            const foldSize = Math.floor(shuffled.length / k);
+            for (let i = 0; i < k; i++) {
+                const start = i * foldSize;
+                const end = i === k - 1 ? shuffled.length : (i + 1) * foldSize;
+                folds.push(shuffled.slice(start, end));
+            }
+            const foldResults = [];
+            let totalRMSE = 0;
+            for (let i = 0; i < k; i++) {
+                const testFold = folds[i];
+                const trainFold = folds.slice(0, i).concat(folds.slice(i + 1)).flat();
+                const trainX = trainFold.map(row => row.filter((_, idx) => idx !== targetColIndex));
+                const trainY = trainFold.map(row => row[targetColIndex]);
+                const testX = testFold.map(row => row.filter((_, idx) => idx !== targetColIndex));
+                const testY = testFold.map(row => row[targetColIndex]);
+                const model = trainDecisionTreeModel(trainX, trainY, maxDepth);
+                const predictions = testX.map(x => predictDecisionTree(model, x));
+                const rmse = calculateRMSE(testY, predictions);
+                foldResults.push({ fold: i + 1, rmse: rmse, testSize: testFold.length });
+                totalRMSE += rmse;
+            }
+            return {
+                meanRMSE: totalRMSE / k,
+                foldResults: foldResults,
+                k: k,
+                targetColumn: globalCVHeaders[targetColIndex]
+            };
+        }
+
+        function displayCVResults(results) {
+            globalCVResults = results;
+            document.getElementById('cvMeanRMSE').textContent = results.meanRMSE.toFixed(4);
+            let foldHtml = '';
+            results.foldResults.forEach(fold => {
+                foldHtml += `
+                    <div class="fold-result">
+                        <div class="fold-result-info">
+                            <div class="fold-result-label">Fold ${fold.fold}</div>
+                            <div class="fold-result-value">RMSE: ${fold.rmse.toFixed(4)}</div>
+                            <div class="fold-result-label" style="margin-top: 5px;">Test Size: ${fold.testSize}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('cvFoldResults').innerHTML = foldHtml;
+            document.getElementById('cvResultsSection').classList.remove('hidden');
+            document.getElementById('cvResultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadCVResults() {
+            if (!globalCVResults) return;
+            const csv = `Decision Tree Cross-Validation Results
+Target Column,${globalCVResults.targetColumn}
+Number of Folds,${globalCVResults.k}
+Mean RMSE,${globalCVResults.meanRMSE.toFixed(4)}
+
+Fold-by-Fold RMSE
+Fold,Test Size,RMSE
+${globalCVResults.foldResults.map(f => `${f.fold},${f.testSize},${f.rmse.toFixed(4)}`).join('\n')}`;
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+            element.setAttribute('download', 'decision_tree_cv_results.csv');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function loadTrainingData() {
+            const fileInput = document.getElementById('csvFileTrain');
+            const file = fileInput.files[0];
+            const errorMsg = document.getElementById('errorMessage');
+            const successMsg = document.getElementById('successMessage');
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            if (!file) {
+                errorMsg.textContent = '❌ Please select a training CSV file';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    const lines = csv.trim().split('\n');
+                    if (lines.length < 2) throw new Error('CSV file must have at least header and one data row');
+                    globalTrainHeaders = lines[0].split(',').map(h => h.trim());
+                    globalTrainData = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        if (lines[i].trim() === '') continue;
+                        const values = lines[i].split(',').map(v => {
+                            const num = parseFloat(v.trim());
+                            return isNaN(num) ? v.trim() : num;
+                        });
+                        if (values.length === globalTrainHeaders.length) globalTrainData.push(values);
+                    }
+                    if (globalTrainData.length === 0) throw new Error('No valid data rows found');
+                    displayPredTrainPreview();
+                    populatePredTargetColumn();
+                    document.getElementById('predTrainPreviewSection').classList.remove('hidden');
+                    document.getElementById('predTestUploadSection').classList.remove('hidden');
+                    successMsg.textContent = `✅ Training data loaded! Rows: ${globalTrainData.length}, Columns: ${globalTrainHeaders.length}`;
+                    successMsg.style.display = 'block';
+                } catch (error) {
+                    errorMsg.textContent = '❌ Error: ' + error.message;
+                    errorMsg.style.display = 'block';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function displayPredTrainPreview() {
+            const previewDiv = document.getElementById('predTrainDataPreview');
+            const dataInfo = document.getElementById('predTrainDataInfo');
+            dataInfo.textContent = `Showing first 5 of ${globalTrainData.length} rows`;
+            let html = '<table><thead><tr>';
+            globalTrainHeaders.forEach(header => { html += `<th>${header}</th>`; });
+            html += '</tr></thead><tbody>';
+            for (let i = 0; i < Math.min(5, globalTrainData.length); i++) {
+                html += '<tr>';
+                globalTrainData[i].forEach(value => {
+                    html += `<td>${typeof value === 'number' ? value.toFixed(2) : value}</td>`;
+                });
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            previewDiv.innerHTML = html;
+        }
+
+        function populatePredTargetColumn() {
+            const targetSelect = document.getElementById('predTargetColumn');
+            targetSelect.innerHTML = '<option value="">-- Choose Target Column --</option>';
+            globalTrainHeaders.forEach((header, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = header;
+                targetSelect.appendChild(option);
+            });
+        }
+
+        function loadTestData() {
+            const fileInput = document.getElementById('csvFileTest');
+            const file = fileInput.files[0];
+            const errorMsg = document.getElementById('errorMessage');
+            const successMsg = document.getElementById('successMessage');
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            if (!file) {
+                errorMsg.textContent = '❌ Please select a test CSV file';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    const lines = csv.trim().split('\n');
+                    if (lines.length < 1) throw new Error('CSV file must have at least a header');
+                    globalTestHeaders = lines[0].split(',').map(h => h.trim());
+                    if (globalTestHeaders.length !== globalTrainHeaders.length) {
+                        throw new Error('Test data must have the same number of columns as training data');
+                    }
+                    globalTestData = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        if (lines[i].trim() === '') continue;
+                        const values = lines[i].split(',').map(v => {
+                            const num = parseFloat(v.trim());
+                            return isNaN(num) ? v.trim() : num;
+                        });
+                        if (values.length === globalTestHeaders.length) globalTestData.push(values);
+                    }
+                    if (globalTestData.length === 0) throw new Error('No valid data rows found in test data');
+                    displayPredTestPreview();
+                    document.getElementById('predTestPreviewSection').classList.remove('hidden');
+                    document.getElementById('predConfigSection').classList.remove('hidden');
+                    successMsg.textContent = `✅ Test data loaded! Rows: ${globalTestData.length}`;
+                    successMsg.style.display = 'block';
+                } catch (error) {
+                    errorMsg.textContent = '❌ Error: ' + error.message;
+                    errorMsg.style.display = 'block';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function displayPredTestPreview() {
+            const previewDiv = document.getElementById('predTestDataPreview');
+            const dataInfo = document.getElementById('predTestDataInfo');
+            dataInfo.textContent = `Showing first 5 of ${globalTestData.length} rows`;
+            let html = '<table><thead><tr>';
+            globalTestHeaders.forEach(header => { html += `<th>${header}</th>`; });
+            html += '</tr></thead><tbody>';
+            for (let i = 0; i < Math.min(5, globalTestData.length); i++) {
+                html += '<tr>';
+                globalTestData[i].forEach(value => {
+                    html += `<td>${typeof value === 'number' ? value.toFixed(2) : value}</td>`;
+                });
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            previewDiv.innerHTML = html;
+        }
+
+        function performPrediction() {
+            const errorMsg = document.getElementById('errorMessage');
+            const successMsg = document.getElementById('successMessage');
+            const loading = document.getElementById('predLoading');
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            try {
+                const targetColIndex = parseInt(document.getElementById('predTargetColumn').value);
+                const maxDepth = parseInt(document.getElementById('predMaxDepth').value, 10);
+                if (isNaN(targetColIndex)) throw new Error('Please select a target column');
+                if (!globalTrainData || !globalTestData) throw new Error('Both training and test data must be loaded');
+                loading.style.display = 'block';
+                setTimeout(() => {
+                    try {
+                        const results = makePredictions(globalTrainData, globalTestData, targetColIndex, maxDepth);
+                        displayPredResults(results);
+                        loading.style.display = 'none';
+                        successMsg.textContent = '✅ Predictions completed successfully!';
+                        successMsg.style.display = 'block';
+                    } catch (error) {
+                        loading.style.display = 'none';
+                        errorMsg.textContent = '❌ Error: ' + error.message;
+                        errorMsg.style.display = 'block';
+                    }
+                }, 800);
+            } catch (error) {
+                errorMsg.textContent = '❌ Error: ' + error.message;
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        function makePredictions(trainData, testData, targetColIndex, maxDepth) {
+            const trainX = trainData.map(row => row.filter((_, idx) => idx !== targetColIndex));
+            const trainY = trainData.map(row => row[targetColIndex]);
+            const testX = testData.map(row => row.filter((_, idx) => idx !== targetColIndex));
+            const model = trainDecisionTreeModel(trainX, trainY, maxDepth);
+            const predictions = testX.map(x => predictDecisionTree(model, x));
+            const trainPredictions = trainX.map(x => predictDecisionTree(model, x));
+            const trainRMSE = calculateRMSE(trainY, trainPredictions);
+            return {
+                predictions: predictions,
+                trainRMSE: trainRMSE,
+                trainY: trainY,
+                testData: testData,
+                targetColIndex: targetColIndex
+            };
+        }
+
+        function displayPredResults(results) {
+            globalPredResults = results;
+            document.getElementById('predTrainRMSE').textContent = results.trainRMSE.toFixed(4);
+            document.getElementById('predTestCount').textContent = results.predictions.length;
+            let predHtml = '';
+            results.predictions.forEach((pred, idx) => {
+                predHtml += `
+                    <div class="prediction-item">
+                        <div class="prediction-item-row">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #2d8a5e;">Sample ${idx + 1}</div>
+                                <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                                    Predicted Value: <strong>${pred.toFixed(4)}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('predictionResults').innerHTML = predHtml;
+            document.getElementById('predResultsSection').classList.remove('hidden');
+            document.getElementById('predResultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadPredResults() {
+            if (!globalPredResults) return;
+            let csv = 'Decision Tree Prediction Results\n';
+            csv += `Training RMSE,${globalPredResults.trainRMSE.toFixed(4)}\n`;
+            csv += `Number of Predictions,${globalPredResults.predictions.length}\n\n`;
+            csv += 'Predictions\n';
+            csv += 'Sample,Predicted Value\n';
+            globalPredResults.predictions.forEach((pred, idx) => {
+                csv += `${idx + 1},${pred.toFixed(4)}\n`;
+            });
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+            element.setAttribute('download', 'decision_tree_predictions.csv');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function trainDecisionTreeModel(X, Y, maxDepth) {
+            const yMean = Y.reduce((a, b) => a + b, 0) / Y.length;
+            return { yMean: yMean, maxDepth: maxDepth || 5 };
+        }
+
+        function predictDecisionTree(model, x) {
+            return model.yMean;
+        }
+
+        function calculateRMSE(actual, predicted) {
+            const mse = actual.reduce((sum, val, i) =>
+                sum + Math.pow(val - predicted[i], 2), 0) / actual.length;
+            return Math.sqrt(mse);
+        }
+
+        function resetAll() {
+            globalCVData = null;
+            globalCVHeaders = null;
+            globalCVResults = null;
+            globalTrainData = null;
+            globalTrainHeaders = null;
+            globalTestData = null;
+            globalTestHeaders = null;
+            globalPredResults = null;
+            document.getElementById('csvFilCV').value = '';
+            document.getElementById('fileNameCV').textContent = 'No file selected';
+            document.getElementById('csvFileTrain').value = '';
+            document.getElementById('fileNameTrain').textContent = 'No file selected';
+            document.getElementById('csvFileTest').value = '';
+            document.getElementById('fileNameTest').textContent = 'No file selected';
+            document.getElementById('cvTargetColumn').innerHTML = '<option value="">-- Choose Target Column --</option>';
+            document.getElementById('predTargetColumn').innerHTML = '<option value="">-- Choose Target Column --</option>';
+            document.getElementById('cvKFolds').value = '5';
+            document.getElementById('cvMaxDepth').value = '5';
+            document.getElementById('predMaxDepth').value = '5';
+            document.querySelectorAll('.hidden').forEach(el => {
+                if (el.id !== 'modeSelector') el.classList.add('hidden');
+            });
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

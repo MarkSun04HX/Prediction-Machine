@@ -3,11 +3,11 @@
 ## Overview
 Easy-ML is a user-friendly machine learning library that provides easy-to-use implementations of popular algorithms. This documentation covers setup, file structure, CSV format requirements, per-model feature requirements, and evaluation metrics.
 
-All browser tools live in a **single file**: **`index.html`**. Open it locally (double-click or “Open with browser”). Pick a model on the hub, then use Cross-Validation or Prediction in the same page—nothing else to download or link to.
+Open **`models.html`** in the project root to pick a model; each tool opens as its own page under **`models/`** (for example `models/XGBoost.html`).
 
-You can copy **`index.html` alone** (for example into `Downloads`) and it will still work; there are no separate `models/` paths or other HTML files required.
+Keep **`models.html`** next to the **`models/`** folder so links like `./models/XGBoost.html` resolve correctly. If you only copy files elsewhere, copy both `models.html` and the whole **`models/`** directory together.
 
-If a preview blocks `file://`, run a local server from the project folder and open `http://localhost:8000/index.html`:
+If a preview blocks `file://`, run a local server from the project folder and open `http://localhost:8000/models.html`:
 
 ```bash
 cd /path/to/Easy-ML && python3 -m http.server 8000
@@ -65,7 +65,8 @@ cd /path/to/Easy-ML && python3 -m http.server 8000
    ```
 
 ## File Structure
-- `index.html` - **Only file needed in the browser**: model hub plus every model workflow (CV & prediction) in one page.
+- `models.html` - Hub page that links to each standalone model tool.
+- `models/` - One HTML file per model (CV & prediction UI for each).
 - `source_code/` - Optional folder for Python/model source implementations and shared utilities.
 - `data/` - Input CSV files.
 - `requirements.txt` - Python dependencies.

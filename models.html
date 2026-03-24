@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy-ML — Model hub (models.html)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+            align-items: stretch;
+        }
+
+        .model-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .model-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .model-card:focus-visible {
+            outline: 3px solid rgba(255, 255, 255, 0.9);
+            outline-offset: 3px;
+        }
+
+        .model-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .model-card h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            min-height: 2.2em;
+        }
+
+        .model-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 0.95em;
+            min-height: 4.8em;
+        }
+
+        .model-details {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            min-height: 238px;
+        }
+
+        .detail-item {
+            margin-bottom: 12px;
+            font-size: 0.9em;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #333;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            color: #666;
+            padding-left: 10px;
+            border-left: 3px solid #667eea;
+            display: block;
+            min-height: 1.2em;
+        }
+
+        .model-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            min-height: 52px;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .model-card:hover .model-btn {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .model-btn.disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+
+            .models-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .model-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Easy-ML</h1>
+            <p>Select Your Machine Learning Model</p>
+        </div>
+
+        <div class="models-grid">
+            <!-- XGBoost Card -->
+            <a class="model-card" href="./models/XGBoost.html">
+                <div class="model-icon">🚀</div>
+                <h2>XGBoost</h2>
+                <p class="model-description">
+                    Fast gradient boosting for tabular data, with strong performance on many regression and classification tasks.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item">
+                        <span class="detail-label">📊 Best For:</span>
+                        <span class="detail-value">Tabular data, classification & regression, competitions</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">⚡ Speed:</span>
+                        <span class="detail-value">Very Fast</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">📈 Accuracy:</span>
+                        <span class="detail-value">Excellent</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">🎯 Interpretability:</span>
+                        <span class="detail-value">Moderate</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">💾 Data Size:</span>
+                        <span class="detail-value">Small to Large</span>
+                    </div>
+                </div>
+                <span class="model-btn">Try XGBoost →</span>
+            </a>
+
+            <!-- Random Forest Card -->
+            <a class="model-card" href="./models/RandomForest.html">
+                <div class="model-icon">🌲</div>
+                <h2>Random Forest</h2>
+                <p class="model-description">
+                    Ensemble of decision trees trained on random samples to produce stable and robust predictions.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item">
+                        <span class="detail-label">📊 Best For:</span>
+                        <span class="detail-value">Tabular data, mixed feature types, balanced datasets</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">⚡ Speed:</span>
+                        <span class="detail-value">Fast</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">📈 Accuracy:</span>
+                        <span class="detail-value">Very Good</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">🎯 Interpretability:</span>
+                        <span class="detail-value">Good</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">💾 Data Size:</span>
+                        <span class="detail-value">Small to Medium</span>
+                    </div>
+                </div>
+                <span class="model-btn">Try Random Forest →</span>
+            </a>
+
+            <!-- Linear Regression Card -->
+            <a class="model-card" href="./models/LinearRegression.html">
+                <div class="model-icon">📉</div>
+                <h2>Linear Regression</h2>
+                <p class="model-description">
+                    A foundational regression model that finds the best-fit line through your data, ideal for understanding linear relationships and quick baseline models.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item">
+                        <span class="detail-label">📊 Best For:</span>
+                        <span class="detail-value">Simple relationships, interpretability, baseline comparison</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">⚡ Speed:</span>
+                        <span class="detail-value">Instant</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">📈 Accuracy:</span>
+                        <span class="detail-value">Variable (depends on data)</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">🎯 Interpretability:</span>
+                        <span class="detail-value">Excellent</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">💾 Data Size:</span>
+                        <span class="detail-value">Any Size</span>
+                    </div>
+                </div>
+                <span class="model-btn">Try Linear Regression →</span>
+            </a>
+            <!-- Elastic Net Card -->
+            <a class="model-card" href="./models/ElasticNet.html">
+                <div class="model-icon">🔗</div>
+                <h2>Elastic Net</h2>
+                <p class="model-description">
+                    Linear model with mixed L1/L2 regularization for better stability when features are correlated.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item"><span class="detail-label">📊 Best For:</span><span class="detail-value">Regularized linear regression, high-dimensional data</span></div>
+                    <div class="detail-item"><span class="detail-label">⚡ Speed:</span><span class="detail-value">Very Fast</span></div>
+                    <div class="detail-item"><span class="detail-label">📈 Accuracy:</span><span class="detail-value">Good</span></div>
+                    <div class="detail-item"><span class="detail-label">🎯 Interpretability:</span><span class="detail-value">High</span></div>
+                    <div class="detail-item"><span class="detail-label">💾 Data Size:</span><span class="detail-value">Small to Medium</span></div>
+                </div>
+                <span class="model-btn">Try Elastic Net →</span>
+            </a>
+
+            <!-- Decision Tree Card -->
+            <a class="model-card" href="./models/DecisionTree.html">
+                <div class="model-icon">🌳</div>
+                <h2>Decision Tree</h2>
+                <p class="model-description">
+                    A tree model that splits features into human-readable rules for straightforward model behavior.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item"><span class="detail-label">📊 Best For:</span><span class="detail-value">Interpretable baseline models, rule-like insights</span></div>
+                    <div class="detail-item"><span class="detail-label">⚡ Speed:</span><span class="detail-value">Fast</span></div>
+                    <div class="detail-item"><span class="detail-label">📈 Accuracy:</span><span class="detail-value">Good</span></div>
+                    <div class="detail-item"><span class="detail-label">🎯 Interpretability:</span><span class="detail-value">Excellent</span></div>
+                    <div class="detail-item"><span class="detail-label">💾 Data Size:</span><span class="detail-value">Small to Medium</span></div>
+                </div>
+                <span class="model-btn">Try Decision Tree →</span>
+            </a>
+
+            <!-- Neural Networks Card -->
+            <a class="model-card" href="./models/NeuralNetworks.html">
+                <div class="model-icon">🧠</div>
+                <h2>Neural Networks</h2>
+                <p class="model-description">
+                    Non-linear function approximators suited for complex numeric patterns and interactions.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item"><span class="detail-label">📊 Best For:</span><span class="detail-value">Complex nonlinear relationships</span></div>
+                    <div class="detail-item"><span class="detail-label">⚡ Speed:</span><span class="detail-value">Medium</span></div>
+                    <div class="detail-item"><span class="detail-label">📈 Accuracy:</span><span class="detail-value">Very Good</span></div>
+                    <div class="detail-item"><span class="detail-label">🎯 Interpretability:</span><span class="detail-value">Lower</span></div>
+                    <div class="detail-item"><span class="detail-label">💾 Data Size:</span><span class="detail-value">Medium to Large</span></div>
+                </div>
+                <span class="model-btn">Try Neural Networks →</span>
+            </a>
+
+            <!-- CatBoost Card -->
+            <a class="model-card" href="./models/CatBoost.html">
+                <div class="model-icon">🐱</div>
+                <h2>CatBoost</h2>
+                <p class="model-description">
+                    Gradient boosting designed for robust tabular performance with strong default settings.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item"><span class="detail-label">📊 Best For:</span><span class="detail-value">Tabular regression/classification</span></div>
+                    <div class="detail-item"><span class="detail-label">⚡ Speed:</span><span class="detail-value">Fast</span></div>
+                    <div class="detail-item"><span class="detail-label">📈 Accuracy:</span><span class="detail-value">Excellent</span></div>
+                    <div class="detail-item"><span class="detail-label">🎯 Interpretability:</span><span class="detail-value">Moderate</span></div>
+                    <div class="detail-item"><span class="detail-label">💾 Data Size:</span><span class="detail-value">Small to Large</span></div>
+                </div>
+                <span class="model-btn">Try CatBoost →</span>
+            </a>
+
+            <!-- SVMs Card -->
+            <a class="model-card" href="./models/SVMs.html">
+                <div class="model-icon">🧭</div>
+                <h2>SVMs</h2>
+                <p class="model-description">
+                    Margin-based models that can learn linear or nonlinear boundaries with kernels.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item"><span class="detail-label">📊 Best For:</span><span class="detail-value">Small/medium data, clear class boundaries</span></div>
+                    <div class="detail-item"><span class="detail-label">⚡ Speed:</span><span class="detail-value">Medium</span></div>
+                    <div class="detail-item"><span class="detail-label">📈 Accuracy:</span><span class="detail-value">Very Good</span></div>
+                    <div class="detail-item"><span class="detail-label">🎯 Interpretability:</span><span class="detail-value">Moderate</span></div>
+                    <div class="detail-item"><span class="detail-label">💾 Data Size:</span><span class="detail-value">Small to Medium</span></div>
+                </div>
+                <span class="model-btn">Try SVMs →</span>
+            </a>
+
+            <!-- KNNs Card -->
+            <a class="model-card" href="./models/KNNs.html">
+                <div class="model-icon">📍</div>
+                <h2>KNNs</h2>
+                <p class="model-description">
+                    Instance-based model that predicts from nearby data points in feature space.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item"><span class="detail-label">📊 Best For:</span><span class="detail-value">Local patterns, intuitive baselines</span></div>
+                    <div class="detail-item"><span class="detail-label">⚡ Speed:</span><span class="detail-value">Fast train / slower inference</span></div>
+                    <div class="detail-item"><span class="detail-label">📈 Accuracy:</span><span class="detail-value">Good</span></div>
+                    <div class="detail-item"><span class="detail-label">🎯 Interpretability:</span><span class="detail-value">High</span></div>
+                    <div class="detail-item"><span class="detail-label">💾 Data Size:</span><span class="detail-value">Small to Medium</span></div>
+                </div>
+                <span class="model-btn">Try KNNs →</span>
+            </a>
+
+            <!-- LightGBM Card -->
+            <a class="model-card" href="./models/LightGBM.html">
+                <div class="model-icon">💡</div>
+                <h2>LightGBM</h2>
+                <p class="model-description">
+                    Histogram-based gradient boosting optimized for speed and performance on large tabular datasets.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item"><span class="detail-label">📊 Best For:</span><span class="detail-value">Fast boosting on medium to large tabular data</span></div>
+                    <div class="detail-item"><span class="detail-label">⚡ Speed:</span><span class="detail-value">Very Fast</span></div>
+                    <div class="detail-item"><span class="detail-label">📈 Accuracy:</span><span class="detail-value">Excellent</span></div>
+                    <div class="detail-item"><span class="detail-label">🎯 Interpretability:</span><span class="detail-value">Moderate</span></div>
+                    <div class="detail-item"><span class="detail-label">💾 Data Size:</span><span class="detail-value">Medium to Large</span></div>
+                </div>
+                <span class="model-btn">Try LightGBM →</span>
+            </a>
+
+            <!-- Logistic Regression Card -->
+            <a class="model-card" href="./models/LogisticRegression.html">
+                <div class="model-icon">📐</div>
+                <h2>Logistic Regression</h2>
+                <p class="model-description">
+                    A linear probabilistic classifier that is fast, interpretable, and effective for baseline classification.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item"><span class="detail-label">📊 Best For:</span><span class="detail-value">Binary or multiclass classification baselines</span></div>
+                    <div class="detail-item"><span class="detail-label">⚡ Speed:</span><span class="detail-value">Very Fast</span></div>
+                    <div class="detail-item"><span class="detail-label">📈 Accuracy:</span><span class="detail-value">Good</span></div>
+                    <div class="detail-item"><span class="detail-label">🎯 Interpretability:</span><span class="detail-value">High</span></div>
+                    <div class="detail-item"><span class="detail-label">💾 Data Size:</span><span class="detail-value">Small to Medium</span></div>
+                </div>
+                <span class="model-btn">Try Logistic Regression →</span>
+            </a>
+
+            <!-- Naive Bayes Card -->
+            <a class="model-card" href="./models/NaiveBayes.html">
+                <div class="model-icon">🧪</div>
+                <h2>Naive Bayes</h2>
+                <p class="model-description">
+                    A lightweight probabilistic classifier that works well on high-dimensional sparse features.
+                </p>
+                <div class="model-details">
+                    <div class="detail-item"><span class="detail-label">📊 Best For:</span><span class="detail-value">Text or sparse-feature classification tasks</span></div>
+                    <div class="detail-item"><span class="detail-label">⚡ Speed:</span><span class="detail-value">Instant</span></div>
+                    <div class="detail-item"><span class="detail-label">📈 Accuracy:</span><span class="detail-value">Good</span></div>
+                    <div class="detail-item"><span class="detail-label">🎯 Interpretability:</span><span class="detail-value">High</span></div>
+                    <div class="detail-item"><span class="detail-label">💾 Data Size:</span><span class="detail-value">Any Size</span></div>
+                </div>
+                <span class="model-btn">Try Naive Bayes →</span>
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>🎓 Easy-ML | Making Machine Learning Accessible to Everyone</p>
+        </div>
+    </div>
+    <script>
+        (function () {
+            document.querySelectorAll('a.model-card[href]').forEach(function (a) {
+                var href = a.getAttribute('href');
+                if (!href || /^(https?:|mailto:|#)/i.test(href)) return;
+                try {
+                    a.setAttribute('href', new URL(href, window.location.href).href);
+                } catch (e) { /* leave as-is */ }
+            });
+        })();
+    </script>
+</body>
+</html>
