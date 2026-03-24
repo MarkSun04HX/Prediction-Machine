@@ -3,91 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediction Webpage</title>
+    <title>ML Cross-Validation Tool</title>
+    <script src="https://cdn.jsdelivr.net/npm/ml-regression@3/dist/ml-regression.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-            color: #fff;
-            padding: 20px;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container {
-            max-width: 800px;
-            margin: auto;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        h1 {
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="file"],
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"]:focus,
+        select:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .error-message {
+            background-color: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #c33;
+        }
+
+        .success-message {
+            background-color: #efe;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #3c3;
+        }
+
+        .info-message {
+            background-color: #eef;
+            color: #33c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #33c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        table thead {
+            background: #667eea;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #667eea;
             text-align: center;
         }
-        .model-card {
-            background: #444;
-            border-radius: 5px;
-            margin: 10px 0;
-            padding: 15px;
-            transition: transform 0.2s;
+
+        .result-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .model-card:hover {
-            transform: scale(1.05);
+
+        .result-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
         }
-        .prediction-form {
-            margin: 20px 0;
+
+        .result-label {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .fold-results {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .fold-result {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .fold-result-row {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            gap: 20px;
         }
-        .prediction-form input {
-            margin: 10px 0;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
+
+        .fold-result-item {
+            flex: 1;
         }
-        .submit-button {
-            background: #00cc44;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
+
+        .fold-result-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .fold-result-value {
+            color: #333;
+            font-weight: 700;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Model Predictions</h1>
-        <form class="prediction-form" id="predictionForm">
-            <input type="number" id="age" placeholder="Age" required>
-            <input type="number" id="income" placeholder="Income" required>
-            <input type="number" id="score" placeholder="Score" required>
-            <input type="number" id="hours" placeholder="Hours" required>
-            <button type="submit" class="submit-button">Predict</button>
-        </form>
-        <div id="results"></div>
-    </div>
-    <script>
-        document.getElementById('predictionForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            // Simulated input retrieval
-            const age = parseInt(document.getElementById('age').value);
-            const income = parseInt(document.getElementById('income').value);
-            const score = parseInt(document.getElementById('score').value);
-            const hours = parseInt(document.getElementById('hours').value);
-            // Simulated model predictions
-            const models = [
-                { name: 'Random Forest', rmse: 5.6, accuracy: 0.85 },
-                { name: 'XGBoost', rmse: 4.3, accuracy: 0.90 }
-            ];
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '';
-            models.forEach(model => {
-                const prediction = Math.random() * 100; // Simulated prediction
-                const rmse = model.rmse;
-                const confidenceInterval = `${(prediction - rmse).toFixed(2)} - ${(prediction + rmse).toFixed(2)}`;
-                resultsDiv.innerHTML += `<div class='model-card'>\n                    <h2>${model.name}</h2>\n                    <p>Prediction: ${prediction.toFixed(2)}</p>\n                    <p>RMSE: ${model.rmse}</p>\n                    <p>Accuracy: ${model.accuracy * 100}%</p>\n                    <p>Confidence Interval: ${confidenceInterval}</p>\n                </div>`;
-            });
-        });
-    </script>
-</body>
-</html>
+        <div class="header">
+            <h1>🤖 ML Cross-Validation Tool</h1>
+            <p>Upload your dataset and perform k-fold cross-validation</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+        <div class="info-message" id="infoMessage"></div>
+
+        <!-- Data Upload Section -->
+        <div class="section">
+            <h2>📊 Step 1: Upload Dataset</h2>
+            <div class="form-group">
+                <label for="csvFile">Select CSV File:</label>
+                <input type="file" id="csvFile" accept=".csv" required>
+            </div>
+            <button onclick="loadDataset()">📁 Load Dataset</button>
+        </div>
+
+        <!-- Data Preview Section -->
+        <div class="section hidden" id="previewSection">
+            <h2>👀 Dataset Preview</h2>
+            <div id="dataPreview"></div>
+        </div>
+
+        <!-- Column Selection Section -->
+        <div class="section hidden" id="configSection">
+            <h2>⚙️ Step 2: Configuration</h2>
+            
+            <div class="form-group">
+                <label for="targetColumn">Select Target Column (Y):</label>
+                <select id="targetColumn" required>
+                    <option value="">-- Choose Target Column --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="kFolds">Number of Folds (k):</label>
+                <input type="number" id="kFolds" value="5" min="2" max="10" required>
+            </div>
+
+            <div class="form-group">
+                <label for="modelType">Select Model Type:</label>
+                <select id="modelType" required>
+                    <option value="linear">Linear Regression</option>
+                    <option value="polynomial">Polynomial Regression (degree 2)</option>
+                </select>
+            </div>
+
+            <button onclick="performCrossValidation()">🔮 Run Cross-Validation</button>
+        </div>
+
+        <!-- Loading Section -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Running cross-validation...</p>
+        </div>
+
+        <!-- Results Section -->
+        <div class="section hidden" id="resultsSection">
+            <h2>📈 Cross-Validation Results</h2>
+            
+            <div class="results-grid">
+                <div*
+
